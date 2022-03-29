@@ -1,0 +1,575 @@
+[
+    {
+        "id": "ba26d37a03f0bbce",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a8d01ce5fa46e414",
+        "type": "inject",
+        "z": "ba26d37a03f0bbce",
+        "name": "Send Data Every 60s",
+        "props": [],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "x": 280,
+        "y": 540,
+        "wires": [
+            [
+                "7ff6c336ac95beea",
+                "920f9e16c11e1e99"
+            ]
+        ]
+    },
+    {
+        "id": "062d392e3f6fe561",
+        "type": "debug",
+        "z": "ba26d37a03f0bbce",
+        "name": "Send Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "6c3148335f19a56e",
+        "type": "comment",
+        "z": "ba26d37a03f0bbce",
+        "name": "Run this Flow to send Data to IoT Hub",
+        "info": "",
+        "x": 270,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "7ff6c336ac95beea",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Generate Ramdom Data for Device 1",
+        "func": "var rdm_num = Math.random();\nvar time = new Date();\n\nconst values = { \n     Humidity: (50+rdm_num*10).toFixed(2), \n     Temperature: (24+rdm_num).toFixed(2),\n     UTC_Time: time\n    };\n\nmsg.payload = values;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 460,
+        "wires": [
+            [
+                "8eb3e356f4c9ce58",
+                "d50c1808b341f1ac",
+                "68bcfcb95dd0aaab",
+                "767188ba80f6d632",
+                "59a21b75c43f8cc4",
+                "befc509bcfb5f9e6",
+                "329910065dbb0524"
+            ]
+        ]
+    },
+    {
+        "id": "e4d267c07676f0c0",
+        "type": "azureiothub",
+        "z": "ba26d37a03f0bbce",
+        "name": "Azure IoT Hub - Device 2",
+        "protocol": "mqtt",
+        "x": 1420,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "84108be15fd983e5",
+        "type": "azureiothub",
+        "z": "ba26d37a03f0bbce",
+        "name": "Azure IoT Hub - Device 1",
+        "protocol": "mqtt",
+        "x": 1420,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8eb3e356f4c9ce58",
+        "type": "json",
+        "z": "ba26d37a03f0bbce",
+        "name": "Object to JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1060,
+        "y": 460,
+        "wires": [
+            [
+                "062d392e3f6fe561",
+                "84108be15fd983e5"
+            ]
+        ]
+    },
+    {
+        "id": "920f9e16c11e1e99",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Generate Ramdom Data for Device 2",
+        "func": "var rdm_num = Math.random();\nvar time = new Date();\n\nconst values = { \n     Humidity: (50+rdm_num*10).toFixed(2), \n     Temperature: (24+rdm_num).toFixed(2),\n     UTC_Time: time\n    };\n\nmsg.payload = values;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 640,
+        "wires": [
+            [
+                "fe92930952bb246e",
+                "89f18a42c573f970",
+                "a2f575425adf1249",
+                "a8fd7df29b736af8",
+                "630008c22b3b02c5",
+                "5b91ccb0506e03e5",
+                "4d40668c0822c1a0"
+            ]
+        ]
+    },
+    {
+        "id": "fe92930952bb246e",
+        "type": "json",
+        "z": "ba26d37a03f0bbce",
+        "name": "Object to JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1060,
+        "y": 640,
+        "wires": [
+            [
+                "062d392e3f6fe561",
+                "e4d267c07676f0c0"
+            ]
+        ]
+    },
+    {
+        "id": "d50c1808b341f1ac",
+        "type": "ui_text",
+        "z": "ba26d37a03f0bbce",
+        "group": "8459241b22d19aa8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperature",
+        "format": "{{msg.payload.Temperature}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1050,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "68bcfcb95dd0aaab",
+        "type": "ui_text",
+        "z": "ba26d37a03f0bbce",
+        "group": "8459241b22d19aa8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Humidity",
+        "format": "{{msg.payload.Humidity}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1040,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "767188ba80f6d632",
+        "type": "ui_gauge",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "8459241b22d19aa8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temp Gauge",
+        "label": "℃",
+        "format": "{{msg.payload.Temperature}}",
+        "min": 0,
+        "max": "40",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "25",
+        "seg2": "30",
+        "className": "",
+        "x": 1050,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "418c3f5e95739ecc",
+        "type": "ui_chart",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "8459241b22d19aa8",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Environment Chart",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "10",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1290,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "59a21b75c43f8cc4",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Humidity",
+        "func": "var original_msg = msg.payload\n\nmsg.topic = \"Humidity\";\nmsg.payload = original_msg.Humidity;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 320,
+        "wires": [
+            [
+                "418c3f5e95739ecc"
+            ]
+        ]
+    },
+    {
+        "id": "befc509bcfb5f9e6",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Temperature",
+        "func": "var original_msg = msg.payload\n\nmsg.topic = \"Temperature\";\nmsg.payload = original_msg.Temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 360,
+        "wires": [
+            [
+                "418c3f5e95739ecc"
+            ]
+        ]
+    },
+    {
+        "id": "329910065dbb0524",
+        "type": "ui_gauge",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "8459241b22d19aa8",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humidity Gauge",
+        "label": "%",
+        "format": "{{msg.payload.Humidity}}",
+        "min": 0,
+        "max": "70",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1060,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "a8fd7df29b736af8",
+        "type": "ui_text",
+        "z": "ba26d37a03f0bbce",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperature",
+        "format": "{{msg.payload.Temperature}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1050,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "630008c22b3b02c5",
+        "type": "ui_text",
+        "z": "ba26d37a03f0bbce",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Humidity",
+        "format": "{{msg.payload.Humidity}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1040,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "89f18a42c573f970",
+        "type": "ui_gauge",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temp Gauge",
+        "label": "℃",
+        "format": "{{msg.payload.Temperature}}",
+        "min": 0,
+        "max": "40",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "25",
+        "seg2": "30",
+        "className": "",
+        "x": 1050,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "851554e438dd6f9a",
+        "type": "ui_chart",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "label": "Environment Chart",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "10",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1290,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5b91ccb0506e03e5",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Humidity",
+        "func": "var original_msg = msg.payload\n\nmsg.topic = \"Humidity\";\nmsg.payload = original_msg.Humidity;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 1000,
+        "wires": [
+            [
+                "851554e438dd6f9a"
+            ]
+        ]
+    },
+    {
+        "id": "4d40668c0822c1a0",
+        "type": "function",
+        "z": "ba26d37a03f0bbce",
+        "name": "Temperature",
+        "func": "var original_msg = msg.payload\n\nmsg.topic = \"Temperature\";\nmsg.payload = original_msg.Temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 1040,
+        "wires": [
+            [
+                "851554e438dd6f9a"
+            ]
+        ]
+    },
+    {
+        "id": "a2f575425adf1249",
+        "type": "ui_gauge",
+        "z": "ba26d37a03f0bbce",
+        "name": "",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humidity Gauge",
+        "label": "%",
+        "format": "{{msg.payload.Humidity}}",
+        "min": 0,
+        "max": "70",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1060,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "02fcc4215a294e78",
+        "type": "ui_spacer",
+        "z": "ba26d37a03f0bbce",
+        "name": "spacer",
+        "group": "8459241b22d19aa8",
+        "order": 6,
+        "width": "0",
+        "height": "0"
+    },
+    {
+        "id": "cf7d981f4ea7f567",
+        "type": "ui_spacer",
+        "z": "ba26d37a03f0bbce",
+        "name": "spacer",
+        "group": "8459241b22d19aa8",
+        "order": 3,
+        "width": "0",
+        "height": "0"
+    },
+    {
+        "id": "b7aa46fae12b1b60",
+        "type": "ui_spacer",
+        "z": "ba26d37a03f0bbce",
+        "name": "spacer",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 3,
+        "width": "0",
+        "height": "0"
+    },
+    {
+        "id": "938eed812bcb7676",
+        "type": "ui_spacer",
+        "z": "ba26d37a03f0bbce",
+        "name": "spacer",
+        "group": "6cd25d1c4e0dc48f",
+        "order": 6,
+        "width": "0",
+        "height": "0"
+    },
+    {
+        "id": "8459241b22d19aa8",
+        "type": "ui_group",
+        "name": "Device 01",
+        "tab": "46371c16b6c51018",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6cd25d1c4e0dc48f",
+        "type": "ui_group",
+        "name": "Device 02",
+        "tab": "46371c16b6c51018",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "46371c16b6c51018",
+        "type": "ui_tab",
+        "name": "IoT Dashboard",
+        "icon": "cloud",
+        "disabled": false,
+        "hidden": false
+    }
+]
