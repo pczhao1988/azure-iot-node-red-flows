@@ -7,4 +7,6 @@ Please note this repo contains multiple node-red flow samples to send data from 
 - Install the nodes listed in the [useful-nodes](useful-nodes.md), fell free to use [Palette Manager with UI](https://nodered.org/docs/user-guide/editor/palette/manager) or [NPM](https://nodered.org/docs/user-guide/runtime/adding-nodes#installing-with-npm)
 - Import the node and]= enjoy, instructions can be found [here](https://nodered.org/docs/user-guide/editor/workspace/import-export)
 
-1.  Generate Random data and send to IoT Hub with Dashboard view
+
+### Sample Flow list: 
+#### [1. Generate Random data and send to IoT Hub with Dashboard view](./Ramdom%20Data%20to%20Azure%20IoT%20with%20Dashboard/)
