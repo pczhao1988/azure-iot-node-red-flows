@@ -50,13 +50,13 @@
 5. Create alias as showed below:</br> ![alias](./images/alias.png)</br></br>
 6. Update template nodered in Device Template:</br>
     ![template-nodere](./images/central%20config.png)</br></br>
-    ![objects-config](./images/object.png)
+    ![objects-config](./images/object.png)</br></br>
 
 ### Screenshots:
-1. Node-Red Flows - OEE:</br> ![Node-Red Flows - OEE](./images/OEE.png) ![Node-Red Flows - OEE - dashboard](./images/nodered%20dashboard.png)</br></br>
+1. Node-Red Flows - OEE:</br> ![Node-Red Flows - OEE](./images/OEE.png)</br></br> ![Node-Red Flows - OEE - dashboard](./images/nodered%20dashboard.png)</br></br>
 2. Node-Red Flows - Reverse Control:</br> ![Node-Red Flows - Reverse Control](./images/reverse%20control.png)</br></br>
 3. Node-Red Flows - KepServer/PLC to IoT Central:</br> ![Node-Red Flows - KepServer/PLC to IoT Central](./images/Machine%20Data.png)</br></br>
-4. Node-Red Flows - OPC-UA NodeID Explorer:</br> ![Node-Red Flows - OPC-UA NodeID Explorer](./images/explorer.png) ![Node-Red Flows - OPC-UA NodeID Explorer - dashboard](./images/explorer%20dashboard.png)</br></br>
+4. Node-Red Flows - OPC-UA NodeID Explorer:</br> ![Node-Red Flows - OPC-UA NodeID Explorer](./images/explorer.png)</br></br> ![Node-Red Flows - OPC-UA NodeID Explorer - dashboard](./images/explorer%20dashboard.png)</br></br>
 5. OEE with Grafana:</br> ![OEE with Grafana](./images/oee-dashboard-grafana.png)</br></br>
 6. Azure SQL Server with SQL Server Management Studio:</br> ![Azure SQL Server with SQL Server Management Studio](./images/SSMS.png)</br></br>
 7. IoT Central Screenshots - Control:</br> ![IoT Central Screenshots - Control](./images/central-control.png)</br></br>
