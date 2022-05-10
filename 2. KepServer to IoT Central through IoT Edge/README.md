@@ -1,12 +1,11 @@
 ### Content:
-- [Content:](#content)
-- [Introduction:](#introduction)
-- [Prequisitions:](#prequisitions)
-- [Steps:](#steps)
-- [Screenshots:](#screenshots)
+1. [Introduction](#introduction)
+2. [Prequisitions](#prequisitions)
+3. [Steps](#steps)
+4. [Screenshots](#screenshots)
 
 ### Introduction: 
-1. This [flow.json](./flow.json) contains several flows consolidate into 1 file, they are:
+1. This [flow.json](./flows.json) contains several flows consolidate into 1 file, they are:
     - PLC (OPC-UA) to IoT Central (as a device or as an edge device)
     - Receive reserve control from IoT Central
     - Kepware (OPC-UA) to local Azure SQL Edge, and using grafana to display OEE with local dashboard
