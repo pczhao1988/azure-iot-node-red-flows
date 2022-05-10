@@ -21,3 +21,8 @@ This file will keep updating as more sample flows added into the repo.
     - Palette Manager: search `node-red-contrib-opcua`
     - NPM: run `npm install -g node-red-contrib-opcua`
     - Github link: [Here](https://github.com/mikakaraila/node-red-contrib-opcua)
+
+ 5. OPCUA Communication Node
+    - Palette Manager: search `node-red-contrib-azure-iot-edge-module`
+    - NPM: run `npm install -g node-red-contrib-azure-iot-edge-module`
+    - Github link: [Here](https://github.com/iotblackbelt/noderededgemodule)

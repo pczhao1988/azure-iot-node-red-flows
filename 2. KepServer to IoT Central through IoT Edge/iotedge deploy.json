@@ -1,0 +1,161 @@
+{
+    "modulesContent": {
+        "$edgeAgent": {
+            "properties.desired": {
+                "modules": {
+                    "opcplc": {
+                        "settings": {
+                            "image": "mcr.microsoft.com/iotedge/opc-plc:latest",
+                            "createOptions": "{\"ExposedPorts\":{\"50000/tcp\":{},\"8080/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"50000/tcp\":[{\"HostPort\":\"50000\"}],\"8080/tcp\":[{\"HostPort\":\"8080\"}]}},\"Cmd\":[\"--pn=50000\",\"--autoaccept\",\"--sph\",\"--sn=5\",\"--sr=10\",\"--st=uint\",\"--fn=5\",\"--fr=1\",\"--ft=uint\",\"--ctb\",\"--scn\",\"--lid\",\"--lsn\",\"--ref\",\"--gn=5\",\"--wp=8080\",\"--ph={Your VM Intranet IP}\"]}"
+                        },
+                        "type": "docker",
+                        "version": "1.0",
+                        "imagePullPolicy": "on-create",
+                        "status": "running",
+                        "restartPolicy": "always"
+                    },
+                    "nodered": {
+                        "settings": {
+                            "image": "marketplace.azurecr.io/1604376875527/wedx-nodered",
+                            "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"1880/tcp\":[{\"HostPort\":\"1888\"}]},\"Binds\":[\"{Your Local Folder}:/data\"],\"Privileged\":true}}"
+                        },
+                        "type": "docker",
+                        "version": "1.0",
+                        "env": {
+                            "TZ": {
+                                "value": "Asia/Shanghai"
+                            },
+                            "NODE_RED_CREDENTIAL_SECRET": {
+                                "value": "nodered"
+                            },
+                            "NODE_RED_ENABLE_PROJECTS": {
+                                "value": "true"
+                            }
+                        },
+                        "status": "running",
+                        "restartPolicy": "always"
+                    },
+                    "grafana": {
+                        "settings": {
+                            "image": "grafana/grafana-enterprise",
+                            "createOptions": "{\"User\":\"1000\",\"HostConfig\":{\"PortBindings\":{\"3000/tcp\":[{\"HostPort\":\"3333\"}]},\"Binds\":[\"{Your Local Folder}:/var/lib/grafana\"]}}"
+                        },
+                        "type": "docker",
+                        "version": "1.0",
+                        "env": {
+                            "GF_INSTALL_PLUGINS": {
+                                "value": "grafana-azure-data-explorer-datasource"
+                            }
+                        },
+                        "status": "running",
+                        "restartPolicy": "always"
+                    },
+                    "metrics": {
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-metrics-collector:latest",
+                            "createOptions": ""
+                        },
+                        "type": "docker",
+                        "version": "1.0",
+                        "env": {
+                            "ResourceId": {
+                                "value": "{Your Resource ID}"
+                            },
+                            "UploadTarget": {
+                                "value": "AzureMonitor"
+                            },
+                            "LogAnalyticsWorkspaceId": {
+                                "value": "{Your Log Analytics Workspace ID}"
+                            },
+                            "LogAnalyticsSharedKey": {
+                                "value": "{Your Log Analytics Key}"
+                            },
+                            "ScrapeFrequencyInSecs": {
+                                "value": 300
+                            }
+                        },
+                        "status": "running",
+                        "restartPolicy": "always"
+                    },
+                    "sqledge": {
+                        "settings": {
+                            "image": "mcr.microsoft.com/azure-sql-edge/premium",
+                            "createOptions": "{\"User\":\"root\",\"HostConfig\":{\"CapAdd\":[\"SYS_PTRACE\"],\"Binds\":[\"{Your Local Folder}:/var/opt/mssql\"],\"PortBindings\":{\"1433/tcp\":[{\"HostPort\":\"1444\"}]}},\"Env\":[\"MSSQL_AGENT_ENABLED=TRUE\",\"ClientTransportType=AMQP_TCP_Only\",\"PlanId=asde-premium-on-iot-edge\"]}"
+                        },
+                        "type": "docker",
+                        "version": "1.0",
+                        "env": {
+                            "ACCEPT_EULA": {
+                                "value": "Y"
+                            },
+                            "MSSQL_SA_PASSWORD": {
+                                "value": "{SA Password}"
+                            },
+                            "MSSQL_LCID": {
+                                "value": "1033"
+                            },
+                            "MSSQL_COLLATION": {
+                                "value": "SQL_Latin1_General_CP1_CI_AS"
+                            }
+                        },
+                        "status": "running",
+                        "restartPolicy": "always"
+                    }
+                },
+                "runtime": {
+                    "settings": {
+                        "minDockerVersion": "v1.25"
+                    },
+                    "type": "docker"
+                },
+                "schemaVersion": "1.1",
+                "systemModules": {
+                    "edgeAgent": {
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-agent:1.2",
+                            "createOptions": ""
+                        },
+                        "type": "docker",
+                        "imagePullPolicy": "on-create"
+                    },
+                    "edgeHub": {
+                        "settings": {
+                            "image": "mcr.microsoft.com/azureiotedge-hub:1.2",
+                            "createOptions": "{\"ExposedPorts\":{\"9600/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"443/tcp\":[{\"HostPort\":\"443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"9600/tcp\":[{\"HostPort\":\"9601\"}],\"1883/tcp\":[{\"HostPort\":\"1883\"}]}}}"
+                        },
+                        "type": "docker",
+                        "imagePullPolicy": "on-create",
+                        "status": "running",
+                        "restartPolicy": "always"
+                    }
+                }
+            }
+        },
+        "$edgeHub": {
+            "properties.desired": {
+                "routes": {
+                    "FromNodeREDonIoTEdge": "FROM /messages/modules/nodered/outputs/* INTO $upstream"
+                },
+                "schemaVersion": "1.1",
+                "storeAndForwardConfiguration": {
+                    "timeToLiveSecs": 7200
+                }
+            }
+        },
+        "opcplc": {
+            "properties.desired": {}
+        },
+        "nodered": {
+            "properties.desired": {}
+        },
+        "grafana": {
+            "properties.desired": {}
+        },
+        "metrics": {
+            "properties.desired": {}
+        },
+        "sqledge": {
+            "properties.desired": {}
+        }
+    }
+}

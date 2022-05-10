@@ -1,0 +1,1837 @@
+[
+    {
+        "id": "340d6b2778234272",
+        "type": "tab",
+        "label": "Reverse Control",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "0982fccb1fdc9cae",
+        "type": "modulemethod",
+        "z": "340d6b2778234272",
+        "client": "48aae3275cbd2fea",
+        "method": "PowerStatus",
+        "x": 270,
+        "y": 320,
+        "wires": [
+            [
+                "f071ab75a7c5d06c",
+                "345a1d6815a072f6",
+                "707bae7e6072ac62"
+            ]
+        ]
+    },
+    {
+        "id": "f071ab75a7c5d06c",
+        "type": "function",
+        "z": "340d6b2778234272",
+        "name": "response msg",
+        "func": "var response = { payload:\n\"{\\\"methodpayload\\\": \\\"\" + JSON.stringify(msg.payload) + \"\\\"}\" }\nresponse.payload.timestamp = Date.now()\nresponse.status = 200\nreturn response;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 440,
+        "wires": [
+            [
+                "0982fccb1fdc9cae"
+            ]
+        ]
+    },
+    {
+        "id": "345a1d6815a072f6",
+        "type": "debug",
+        "z": "340d6b2778234272",
+        "name": "PowerStatus Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload.Value",
+        "statusType": "msg",
+        "x": 640,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "707bae7e6072ac62",
+        "type": "function",
+        "z": "340d6b2778234272",
+        "name": "Set PowerStatus to OPCUA Server",
+        "func": "var status = msg.payload.Value\nvar current_status = flow.get(\"power_status\")\n\nif (status == true)\n    {flow.set(\"power_status\", 1);}\nelse if (status == false)\n    {flow.set(\"power_status\", 0);}\nelse\n    {flow.set(\"power_status\", current_status)}\n    \nmsg.payload = flow.get(\"power_status\")\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 360,
+        "wires": [
+            [
+                "a5247dd2490aef3c"
+            ]
+        ]
+    },
+    {
+        "id": "7d3076a991343263",
+        "type": "comment",
+        "z": "340d6b2778234272",
+        "name": "Receive Method Call from Central",
+        "info": "",
+        "x": 230,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "a5247dd2490aef3c",
+        "type": "OpcUa-Item",
+        "z": "340d6b2778234272",
+        "item": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "datatype": "Int16",
+        "value": "0",
+        "name": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "x": 810,
+        "y": 460,
+        "wires": [
+            [
+                "9cbbc1dec7f614ba"
+            ]
+        ]
+    },
+    {
+        "id": "9cbbc1dec7f614ba",
+        "type": "OpcUa-Client",
+        "z": "340d6b2778234272",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "KepServer - 10.0.0.7",
+        "x": 1160,
+        "y": 460,
+        "wires": [
+            [
+                "49350f010fb13bc1"
+            ]
+        ]
+    },
+    {
+        "id": "49350f010fb13bc1",
+        "type": "debug",
+        "z": "340d6b2778234272",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1410,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "bbd9966509e94b36",
+        "type": "tab",
+        "label": "OEE",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7c2c600d.ec34d",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Status Update Every 20 seconds",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "20",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "20",
+        "payloadType": "date",
+        "x": 260,
+        "y": 780,
+        "wires": [
+            [
+                "d45c3f62.8cd78"
+            ]
+        ]
+    },
+    {
+        "id": "d45c3f62.8cd78",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Generate values",
+        "func": "var power_status = flow.get('power_status');\nvar itemCountGood;\nvar itemCountBad;\n\nif (power_status === undefined)\n{\n    flow.set('power_status', 1);\n}\nelse if (power_status === 1)\n{\n    itemCountGood = parseInt(80.0+Math.round(Math.random()*41));\n    itemCountBad = parseInt(Math.round(Math.random()*11));\n}\nelse\n{\n    itemCountGood = 0.0;\n    itemCountBad = 0.0;\n}\n\nflow.set('item_count_good', itemCountGood);\nflow.set('item_count_bad', itemCountBad);\n\nmsg.payload = [\n    flow.get('power_status'),\n    flow.get('item_count_good'),\n    flow.get('item_count_bad'),\n\n]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 780,
+        "wires": [
+            [
+                "f9d0581719f325ef",
+                "354e996c60260729",
+                "b20e23439b824912",
+                "f9ed75607e0f29a0"
+            ]
+        ]
+    },
+    {
+        "id": "f9ed75607e0f29a0",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "Status Output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "1d51db9d55e66969",
+        "type": "OpcUa-Client",
+        "z": "bbd9966509e94b36",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "KepServer - 10.0.0.7",
+        "x": 940,
+        "y": 500,
+        "wires": [
+            [
+                "f7c2c2424ee2d80e"
+            ]
+        ]
+    },
+    {
+        "id": "f13828ee17c5c67d",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "datatype": "Int16",
+        "value": "1",
+        "name": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "x": 530,
+        "y": 540,
+        "wires": [
+            [
+                "1d51db9d55e66969"
+            ]
+        ]
+    },
+    {
+        "id": "a33a678554400496",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "PowerON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "str",
+        "x": 180,
+        "y": 540,
+        "wires": [
+            [
+                "f13828ee17c5c67d"
+            ]
+        ]
+    },
+    {
+        "id": "94955f436e003742",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "PowerOFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "str",
+        "x": 180,
+        "y": 480,
+        "wires": [
+            [
+                "2ae367f3101d55d5"
+            ]
+        ]
+    },
+    {
+        "id": "2ae367f3101d55d5",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "datatype": "Int16",
+        "value": "0",
+        "name": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "x": 530,
+        "y": 480,
+        "wires": [
+            [
+                "1d51db9d55e66969"
+            ]
+        ]
+    },
+    {
+        "id": "f7c2c2424ee2d80e",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1260,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "8dd579f608e9f114",
+        "type": "OpcUa-Client",
+        "z": "bbd9966509e94b36",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "3",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 840,
+        "y": 160,
+        "wires": [
+            [
+                "01cc78fa7d5ed22d",
+                "5f676219f6f58bdb"
+            ]
+        ]
+    },
+    {
+        "id": "01cc78fa7d5ed22d",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Single Sub Value",
+        "func": "var value = msg.payload;\nvar date_time = new Date().toISOString();\nvar msg_time = msg.payload.sourceTimestamp\nvar tag_id = msg.topic;\n  \nconst formatted_json = {\n    \"OPCUA_Tag\":\"\"+tag_id,\n    \"OPCUA_Value\": value,\n    \"Timestamp\": date_time\n}\n  \nflow.set('power_status', value)\n  \nmsg.payload = formatted_json;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 160,
+        "wires": [
+            [
+                "ae09fb3bbd116097"
+            ]
+        ]
+    },
+    {
+        "id": "ae09fb3bbd116097",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload[\"OPCUA_Value\"]",
+        "statusType": "msg",
+        "x": 1370,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "dd645c899d3bce55",
+        "type": "comment",
+        "z": "bbd9966509e94b36",
+        "name": "Machine Power ON or OFF",
+        "info": "",
+        "x": 190,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "e5f2141c7e159e7f",
+        "type": "comment",
+        "z": "bbd9966509e94b36",
+        "name": "Subscribe Machine Status",
+        "info": "",
+        "x": 190,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "39bff920d466ed59",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Subscribe multiple",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "str",
+        "x": 210,
+        "y": 240,
+        "wires": [
+            [
+                "6fc563aa091a0da3"
+            ]
+        ]
+    },
+    {
+        "id": "6fc563aa091a0da3",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Power Status Subscription",
+        "func": "// Tested with Prosys\nmsg.topic = \"multiple\"\nmsg.payload = [\n    {\n        nodeId: \"ns=2;s=OPC Simulator.Group1.PowerStatus\"\n    }\n]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 240,
+        "wires": [
+            [
+                "0983d861e480f1a5"
+            ]
+        ]
+    },
+    {
+        "id": "dc1cf45bfe21c475",
+        "type": "comment",
+        "z": "bbd9966509e94b36",
+        "name": "Machine Production",
+        "info": "",
+        "x": 170,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "373d00752ecb6613",
+        "type": "MSSQL",
+        "z": "bbd9966509e94b36",
+        "mssqlCN": "a2fc8776d47f5b14",
+        "name": "Insert Data to SQL Edge",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "DeviceData",
+        "modeOpt": "",
+        "modeOptType": "bulk",
+        "queryOpt": "",
+        "queryOptType": "editor",
+        "paramsOpt": "",
+        "paramsOptType": "editor",
+        "rows": "payload",
+        "rowsType": "msg",
+        "params": [
+            {
+                "output": false,
+                "name": "NodeID",
+                "type": "NVarChar(256)",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            },
+            {
+                "output": false,
+                "name": "RunningStatus",
+                "type": "NVarChar(256)",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            },
+            {
+                "output": false,
+                "name": "CountGood",
+                "type": "Int",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            },
+            {
+                "output": false,
+                "name": "CountBad",
+                "type": "int",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            },
+            {
+                "output": false,
+                "name": "Frequency",
+                "type": "int",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            },
+            {
+                "output": false,
+                "name": "SourceTimestamp",
+                "type": "DateTime2",
+                "valueType": "num",
+                "value": "0",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            }
+        ],
+        "x": 1550,
+        "y": 1200,
+        "wires": [
+            [
+                "a3f6dd1aa9363577"
+            ]
+        ]
+    },
+    {
+        "id": "a3f6dd1aa9363577",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "SQL Output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1770,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "cc9750deea450ad3",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "SQL Formatter",
+        "func": "var time = new Date().toISOString();\nvar countgood_addr = \"ns=2;s=MES OEE.OEE-CNC1.CountGood\"\nvar countbad_addr = \"ns=2;s=MES OEE.OEE-CNC1.CountBad\";\nvar runningstatus_addr = \"ns=2;s=MES OEE.OEE-CNC1.RunningStatus\";\nvar countgood = msg.payload[countgood_addr];\nvar countbad = msg.payload[countbad_addr];\nvar runningstatus = msg.payload[runningstatus_addr];\nvar msg_interval = msg.payload.msg_inverval;\n\nif (runningstatus == 1)\n    {\n        machine_status = 'On';\n    }\nelse\n    {\n        machine_status= 'Off';\n    }\n\n\nconst status_msg = [{\n    'NodeID' : 'CNC1',\n    'RunningStatus' : machine_status,\n    'CountGood' : countgood,\n    'CountBad' : countbad,\n    'Frequency' : msg_interval,\n    'SourceTimestamp' : time\n}];\n\nmsg.payload = status_msg;\nreturn msg\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1520,
+        "y": 1100,
+        "wires": [
+            [
+                "373d00752ecb6613"
+            ]
+        ]
+    },
+    {
+        "id": "f9d0581719f325ef",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "CountBad",
+        "func": "var countbad = msg.payload[2];\nmsg.payload = countbad;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 720,
+        "wires": [
+            [
+                "da6530c2f03de563",
+                "f9ed75607e0f29a0"
+            ]
+        ]
+    },
+    {
+        "id": "a76888fb9857fd4b",
+        "type": "OpcUa-Client",
+        "z": "bbd9966509e94b36",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "KepServer - 10.0.0.7",
+        "x": 1600,
+        "y": 780,
+        "wires": [
+            [
+                "216255f76c7d11fa"
+            ]
+        ]
+    },
+    {
+        "id": "da6530c2f03de563",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.CountBad",
+        "datatype": "Int16",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.CountBad",
+        "x": 1200,
+        "y": 720,
+        "wires": [
+            [
+                "a76888fb9857fd4b"
+            ]
+        ]
+    },
+    {
+        "id": "013f6c68d912365c",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.CountGood",
+        "datatype": "Int16",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.CountGood",
+        "x": 1210,
+        "y": 780,
+        "wires": [
+            [
+                "a76888fb9857fd4b"
+            ]
+        ]
+    },
+    {
+        "id": "912e420b126ff68d",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.RunningStatus",
+        "datatype": "Int16",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.RunningStatus",
+        "x": 1220,
+        "y": 840,
+        "wires": [
+            [
+                "a76888fb9857fd4b"
+            ]
+        ]
+    },
+    {
+        "id": "354e996c60260729",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "CountGood",
+        "func": "var countgood = msg.payload[1];\nmsg.payload = countgood;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 780,
+        "wires": [
+            [
+                "013f6c68d912365c",
+                "f9ed75607e0f29a0"
+            ]
+        ]
+    },
+    {
+        "id": "b20e23439b824912",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "RunningStatus",
+        "func": "var status_msg = msg.payload[0]\n\nmsg.payload = status_msg;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 840,
+        "wires": [
+            [
+                "912e420b126ff68d",
+                "f9ed75607e0f29a0"
+            ]
+        ]
+    },
+    {
+        "id": "216255f76c7d11fa",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1830,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "0048e349246c62bf",
+        "type": "comment",
+        "z": "bbd9966509e94b36",
+        "name": "OPCUA Read",
+        "info": "",
+        "x": 150,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "85b0ce71a6e11a97",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.CountBad",
+        "datatype": "Int16",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.CountBad",
+        "x": 661,
+        "y": 1119.999994277954,
+        "wires": [
+            [
+                "94fb7f7d7520e4e7"
+            ]
+        ]
+    },
+    {
+        "id": "afa7d465953ec826",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.CountGood",
+        "datatype": "Int16",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.CountGood",
+        "x": 671,
+        "y": 1179.999994277954,
+        "wires": [
+            [
+                "94fb7f7d7520e4e7"
+            ]
+        ]
+    },
+    {
+        "id": "c4cf87c89f40f5b4",
+        "type": "OpcUa-Item",
+        "z": "bbd9966509e94b36",
+        "item": "ns=2;s=MES OEE.OEE-CNC1.RunningStatus",
+        "datatype": "String",
+        "value": "",
+        "name": "ns=2;s=MES OEE.OEE-CNC1.RunningStatus",
+        "x": 681,
+        "y": 1239.999994277954,
+        "wires": [
+            [
+                "94fb7f7d7520e4e7"
+            ]
+        ]
+    },
+    {
+        "id": "6bf894c7f1b646b2",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Status Read Every 30 seconds",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "30",
+        "payloadType": "date",
+        "x": 231,
+        "y": 1179.999994277954,
+        "wires": [
+            [
+                "85b0ce71a6e11a97",
+                "afa7d465953ec826",
+                "c4cf87c89f40f5b4",
+                "36d333b45af21098"
+            ]
+        ]
+    },
+    {
+        "id": "40a82a8455638166",
+        "type": "join",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "4",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 1330,
+        "y": 1040,
+        "wires": [
+            [
+                "9043b40b9f0cbfec",
+                "ae1b354466ab45a1",
+                "cc9750deea450ad3"
+            ]
+        ]
+    },
+    {
+        "id": "9043b40b9f0cbfec",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1510,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "94fb7f7d7520e4e7",
+        "type": "OpcUa-Client",
+        "z": "bbd9966509e94b36",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "KepServer - 10.0.0.7",
+        "x": 1120,
+        "y": 1180,
+        "wires": [
+            [
+                "40a82a8455638166"
+            ]
+        ]
+    },
+    {
+        "id": "ae1b354466ab45a1",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Status Output",
+        "func": "var time = new Date().toISOString();\nvar countgood_addr = \"ns=2;s=MES OEE.OEE-CNC1.CountGood\"\nvar countbad_addr = \"ns=2;s=MES OEE.OEE-CNC1.CountBad\";\nvar runningstatus_addr = \"ns=2;s=MES OEE.OEE-CNC1.RunningStatus\";\nvar countgood = msg.payload[countgood_addr];\nvar countbad = msg.payload[countbad_addr];\nvar runningstatus = msg.payload[runningstatus_addr];\nvar msg_interval = msg.payload.msg_inverval;\n\nif (runningstatus == 1)\n    {\n        machine_status = 'On';\n    }\nelse\n    {\n        machine_status= 'Off';\n    }\n\n\nconst status_msg = {\n    'NodeID' : 'CNC1',\n    'RunningStatus' : machine_status,\n    'CountGood' : countgood,\n    'CountBad' : countbad,\n    'Frequency' : msg_interval,\n    'SourceTimestamp' : time\n};\n\nmsg.payload = status_msg;\nreturn msg\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1520,
+        "y": 1040,
+        "wires": [
+            [
+                "b76d6d760b28d457"
+            ]
+        ]
+    },
+    {
+        "id": "36d333b45af21098",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Interval Set",
+        "func": "var interval = msg.topic;\nmsg.topic = 'msg_inverval';\nmsg.payload = parseInt(interval);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 1040,
+        "wires": [
+            [
+                "40a82a8455638166"
+            ]
+        ]
+    },
+    {
+        "id": "b76d6d760b28d457",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1770,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "22ef734a72954411",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Clear nodeId array",
+        "props": [
+            {
+                "p": "payload",
+                "v": "",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "v": "clearitems",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "clearitems",
+        "payload": "",
+        "payloadType": "str",
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "0983d861e480f1a5"
+            ]
+        ]
+    },
+    {
+        "id": "65b5062ff1e87b61",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Subscribe PowerStatus",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "interval",
+                "v": "10000",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "payload": "{ \"action\": \"subscribe\"}",
+        "payloadType": "json",
+        "x": 540,
+        "y": 100,
+        "wires": [
+            [
+                "8dd579f608e9f114"
+            ]
+        ]
+    },
+    {
+        "id": "dd1711014c5ab1dd",
+        "type": "inject",
+        "z": "bbd9966509e94b36",
+        "name": "Unsubscribe PowerStatus",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=2;s=OPC Simulator.Group1.PowerStatus",
+        "payload": "{ \"action\": \"unsubscribe\"}",
+        "payloadType": "json",
+        "x": 530,
+        "y": 160,
+        "wires": [
+            [
+                "8dd579f608e9f114"
+            ]
+        ]
+    },
+    {
+        "id": "0983d861e480f1a5",
+        "type": "OpcUa-Client",
+        "z": "bbd9966509e94b36",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "3",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 840,
+        "y": 240,
+        "wires": [
+            [
+                "bb499c9bc565e53e",
+                "5f676219f6f58bdb"
+            ]
+        ]
+    },
+    {
+        "id": "bb499c9bc565e53e",
+        "type": "function",
+        "z": "bbd9966509e94b36",
+        "name": "Multi Sub Value",
+        "func": "var opc_value = msg.payload.value.value;\nvar date_time = new Date().toISOString();\nvar msg_time = msg.payload.sourceTimestamp\nvar tag_id = msg.topic;\n  \nconst formatted_json = {\n    \"OPCUA_Tag\":\"\"+tag_id,\n    \"OPCUA_Value\": opc_value,\n    \"Timestamp\": msg_time\n}\n  \nflow.set('power_status', opc_value)\n  \nmsg.payload = formatted_json;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 240,
+        "wires": [
+            [
+                "ae09fb3bbd116097"
+            ]
+        ]
+    },
+    {
+        "id": "5f676219f6f58bdb",
+        "type": "debug",
+        "z": "bbd9966509e94b36",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "8c89270bff0d3ec5",
+        "type": "tab",
+        "label": "Machine Data",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1f93357e2ecf2548",
+        "type": "moduleoutput",
+        "z": "8c89270bff0d3ec5",
+        "client": "48aae3275cbd2fea",
+        "output": "opcplc",
+        "x": 1840,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "b6b20aa249ed23dd",
+        "type": "OpcUa-Client",
+        "z": "8c89270bff0d3ec5",
+        "endpoint": "9d3871c0f966cde5",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "OPC PLC - Localhost",
+        "x": 880,
+        "y": 400,
+        "wires": [
+            [
+                "063dd62598d03e99",
+                "8fe23ac1dedad7b1",
+                "f948d80600db03a1"
+            ]
+        ]
+    },
+    {
+        "id": "1eccaa504132b477",
+        "type": "inject",
+        "z": "8c89270bff0d3ec5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 310,
+        "y": 400,
+        "wires": [
+            [
+                "28626c4d53412e94",
+                "f94f7aa6363fb1c3"
+            ]
+        ]
+    },
+    {
+        "id": "03ecebd89708d263",
+        "type": "debug",
+        "z": "8c89270bff0d3ec5",
+        "name": "opcplc output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1830,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "28626c4d53412e94",
+        "type": "OpcUa-Item",
+        "z": "8c89270bff0d3ec5",
+        "item": "ns=2;s=SpikeData",
+        "datatype": "Double",
+        "value": "",
+        "name": "ns=2;s=SpikeData",
+        "x": 570,
+        "y": 360,
+        "wires": [
+            [
+                "b6b20aa249ed23dd"
+            ]
+        ]
+    },
+    {
+        "id": "f94f7aa6363fb1c3",
+        "type": "OpcUa-Item",
+        "z": "8c89270bff0d3ec5",
+        "item": "ns=2;s=DipData",
+        "datatype": "Double",
+        "value": "",
+        "name": "ns=2;s=DipData",
+        "x": 560,
+        "y": 420,
+        "wires": [
+            [
+                "b6b20aa249ed23dd"
+            ]
+        ]
+    },
+    {
+        "id": "063dd62598d03e99",
+        "type": "ui_chart",
+        "z": "8c89270bff0d3ec5",
+        "name": "",
+        "group": "266b2750f6b8c308",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 1230,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8fe23ac1dedad7b1",
+        "type": "function",
+        "z": "8c89270bff0d3ec5",
+        "name": "JSON Formatter to Central",
+        "func": "var node_id = msg.topic\nvar value = msg.payload\nvar time = new Date().toISOString()\n\nvar frmatted_msg ={\n    [node_id]:{\n    \"NodeId\" : \"\"+node_id,\n    \"Value\" : value,\n    \"Timestamp\" : time}\n}\n\nmsg.topic = 'telemetry'\nmsg.payload = frmatted_msg\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 540,
+        "wires": [
+            [
+                "7231d0481a25062f",
+                "01f89b1f33c367a3"
+            ]
+        ]
+    },
+    {
+        "id": "a2f0d763dab7cb49",
+        "type": "OpcUa-Client",
+        "z": "8c89270bff0d3ec5",
+        "endpoint": "ba32a19de80fe9fa",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "KepServer - 10.0.0.7",
+        "x": 900,
+        "y": 800,
+        "wires": [
+            [
+                "69feea2ec290c52f"
+            ]
+        ]
+    },
+    {
+        "id": "e98e742b933bf478",
+        "type": "debug",
+        "z": "8c89270bff0d3ec5",
+        "name": "kepware output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1640,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "69feea2ec290c52f",
+        "type": "function",
+        "z": "8c89270bff0d3ec5",
+        "name": "JSON Formatter to Hub",
+        "func": "var node_id = msg.topic\nvar value = msg.payload\nvar time = new Date().toISOString()\n\nvar frmatted_msg = {\n    \"node_id\" : \"\"+node_id,\n    \"value\" : value,\n    \"time\" : time\n}\n\nmsg.payload = frmatted_msg\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 800,
+        "wires": [
+            [
+                "e98e742b933bf478"
+            ]
+        ]
+    },
+    {
+        "id": "6d94a40dba482452",
+        "type": "OpcUa-Item",
+        "z": "8c89270bff0d3ec5",
+        "item": "ns=2;s=Opc Plc.Device1.OpcPlc.Telemetry.Anomaly.SpikeData",
+        "datatype": "Double",
+        "value": "",
+        "name": "ns=2;s=SpikeData",
+        "x": 550,
+        "y": 800,
+        "wires": [
+            [
+                "a2f0d763dab7cb49"
+            ]
+        ]
+    },
+    {
+        "id": "946283ea1047349b",
+        "type": "OpcUa-Item",
+        "z": "8c89270bff0d3ec5",
+        "item": "ns=2;s=Opc Plc.Device1.OpcPlc.Telemetry.Anomaly.DipData",
+        "datatype": "Double",
+        "value": "",
+        "name": "ns=2;s=DipData",
+        "x": 540,
+        "y": 880,
+        "wires": [
+            [
+                "a2f0d763dab7cb49"
+            ]
+        ]
+    },
+    {
+        "id": "c00ddd5fe7114e52",
+        "type": "inject",
+        "z": "8c89270bff0d3ec5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 840,
+        "wires": [
+            [
+                "6d94a40dba482452",
+                "946283ea1047349b"
+            ]
+        ]
+    },
+    {
+        "id": "01f89b1f33c367a3",
+        "type": "azureiotdevice",
+        "z": "8c89270bff0d3ec5",
+        "deviceid": "{IoT Central Device ID}",
+        "pnpModelid": "",
+        "connectiontype": "dps",
+        "authenticationmethod": "sas",
+        "iothub": "",
+        "isIotcentral": true,
+        "scopeid": "{IoT Central Scope ID}",
+        "enrollmenttype": "group",
+        "saskey": "{IoT Central DPS Group Key}",
+        "certname": "",
+        "keyname": "",
+        "passphrase": "",
+        "protocol": "mqtt",
+        "retryInterval": 10,
+        "methods": [],
+        "DPSpayload": "",
+        "gatewayHostname": "",
+        "caname": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "x": 1660,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7231d0481a25062f",
+        "type": "debug",
+        "z": "8c89270bff0d3ec5",
+        "name": "Central Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1640,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "7e59d06822e6a27d",
+        "type": "OpcUa-Client",
+        "z": "8c89270bff0d3ec5",
+        "endpoint": "75dfdcda501d76f5",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "Prosys - 10.0.0.7",
+        "x": 950,
+        "y": 1040,
+        "wires": [
+            [
+                "20e819616fc3f257"
+            ]
+        ]
+    },
+    {
+        "id": "95cf34694eef2054",
+        "type": "debug",
+        "z": "8c89270bff0d3ec5",
+        "name": "kepware output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1620,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "20e819616fc3f257",
+        "type": "function",
+        "z": "8c89270bff0d3ec5",
+        "name": "JSON Formatter to Hub",
+        "func": "var node_id = msg.topic\nvar value = msg.payload\nvar time = new Date().toISOString()\n\nvar frmatted_msg = {\n    \"node_id\" : \"\"+node_id,\n    \"value\" : value,\n    \"time\" : time\n}\n\nmsg.payload = frmatted_msg\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 1040,
+        "wires": [
+            [
+                "95cf34694eef2054"
+            ]
+        ]
+    },
+    {
+        "id": "c7b968426f149d4a",
+        "type": "OpcUa-Item",
+        "z": "8c89270bff0d3ec5",
+        "item": "ns=2;s=Opc Plc.Device1.OpcPlc.Telemetry.Anomaly.SpikeData",
+        "datatype": "Double",
+        "value": "",
+        "name": "OpcPlc.Telemetry.Anomaly.SpikeData",
+        "x": 590,
+        "y": 1040,
+        "wires": [
+            [
+                "7e59d06822e6a27d"
+            ]
+        ]
+    },
+    {
+        "id": "7d810f3942bfddba",
+        "type": "inject",
+        "z": "8c89270bff0d3ec5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 1040,
+        "wires": [
+            [
+                "c7b968426f149d4a"
+            ]
+        ]
+    },
+    {
+        "id": "f948d80600db03a1",
+        "type": "join",
+        "z": "8c89270bff0d3ec5",
+        "name": "Join 2 Querys",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1260,
+        "y": 400,
+        "wires": [
+            [
+                "31af89cd3d0e7e9e"
+            ]
+        ]
+    },
+    {
+        "id": "31af89cd3d0e7e9e",
+        "type": "function",
+        "z": "8c89270bff0d3ec5",
+        "name": "Add Timestamp to payload",
+        "func": "var json=msg.payload\nvar time = new Date().toISOString()\n\njson[\"Timestamp\"]=time\n\nmsg.payload = json\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1520,
+        "y": 400,
+        "wires": [
+            [
+                "1f93357e2ecf2548",
+                "03ecebd89708d263"
+            ]
+        ]
+    },
+    {
+        "id": "6b8913b846e9b74f",
+        "type": "comment",
+        "z": "8c89270bff0d3ec5",
+        "name": "From PLC to IoT Central",
+        "info": "",
+        "x": 250,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "47286d5357d51a2c",
+        "type": "comment",
+        "z": "8c89270bff0d3ec5",
+        "name": "From KepServer ",
+        "info": "",
+        "x": 220,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "1c5b548034258e2b",
+        "type": "comment",
+        "z": "8c89270bff0d3ec5",
+        "name": "From Prosys",
+        "info": "",
+        "x": 210,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "7355c7ff.6875b8",
+        "type": "tab",
+        "label": "Browser",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "bcb8bf9d.d874e",
+        "type": "ui_template",
+        "z": "7355c7ff.6875b8",
+        "group": "85144921.8931b8",
+        "name": "Browse",
+        "order": 0,
+        "width": "12",
+        "height": "20",
+        "format": "<div layout=\"row\" layout-align=\"space-between\">\n    <select ng-model=\"item\" ng-options=\"items.item.displayName.text for items in msg.payload\">\n        <option value=\"\">-- Objects Root --</option>\n    </select>\n    <button ng-click=\"send({payload: {actiontype: 'browse', root: item}})\">\n        Browse\n    </button>\n</div>\n<div layout=\"row\" layout-align=\"space-between\">\n    <ul>\n        <li ng-repeat=\"items in msg.payload\">\n          {{items.item.displayName.text}}: {{items.item.nodeId}}\n        </li>\n    </ul>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "x": 250.49998474121094,
+        "y": 81.80000305175781,
+        "wires": [
+            [
+                "1db890d7.e582cf",
+                "420195c6.c1d27c"
+            ]
+        ]
+    },
+    {
+        "id": "1db890d7.e582cf",
+        "type": "ui_toast",
+        "z": "7355c7ff.6875b8",
+        "position": "top right",
+        "displayTime": "2",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": true,
+        "topic": "Browsing...",
+        "name": "Action",
+        "x": 471.49998474121094,
+        "y": 82.59999084472656,
+        "wires": []
+    },
+    {
+        "id": "420195c6.c1d27c",
+        "type": "OpcUa-Browser",
+        "z": "7355c7ff.6875b8",
+        "endpoint": "ba32a19de80fe9fa",
+        "item": "",
+        "datatype": "",
+        "topic": "ns=0;s=85/0:Simulation",
+        "items": [],
+        "name": "",
+        "x": 250.9000244140625,
+        "y": 187.40000915527344,
+        "wires": [
+            [
+                "bcb8bf9d.d874e"
+            ]
+        ]
+    },
+    {
+        "id": "48aae3275cbd2fea",
+        "type": "edgeclient"
+    },
+    {
+        "id": "ba32a19de80fe9fa",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.0.0.7:49321",
+        "secpol": "Basic256Sha256",
+        "secmode": "SignAndEncrypt",
+        "login": false
+    },
+    {
+        "id": "a2fc8776d47f5b14",
+        "type": "MSSQL-CN",
+        "tdsVersion": "7_4",
+        "name": "SQL Edge",
+        "server": "sqledge",
+        "port": "1433",
+        "encyption": true,
+        "trustServerCertificate": true,
+        "database": "telemetry",
+        "useUTC": true,
+        "connectTimeout": "15000",
+        "requestTimeout": "15000",
+        "cancelTimeout": "5000",
+        "pool": "5",
+        "parseJSON": false,
+        "enableArithAbort": true
+    },
+    {
+        "id": "9d3871c0f966cde5",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.0.0.11:50000",
+        "secpol": "Basic256Sha256",
+        "secmode": "SignAndEncrypt",
+        "none": false,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "266b2750f6b8c308",
+        "type": "ui_group",
+        "name": "OPC UA Dashboard",
+        "tab": "630324fc5a2d4354",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "75dfdcda501d76f5",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.0.0.7:53530/OPCUA/SimulationServer",
+        "secpol": "Basic256Sha256",
+        "secmode": "SignAndEncrypt",
+        "none": false,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "85144921.8931b8",
+        "type": "ui_group",
+        "name": "OPCUA",
+        "tab": "440c46c6.769ab8",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "630324fc5a2d4354",
+        "type": "ui_tab",
+        "name": "OPCUA Dashboard",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "440c46c6.769ab8",
+        "type": "ui_tab",
+        "name": "OPCUA - Address Info",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
