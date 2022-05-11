@@ -17,7 +17,8 @@ CREATE TABLE [dbo].[DeviceData](
 	[RunningStatus] [nvarchar](255) NULL,
 	[CountGood] [int] NULL,
 	[CountBad] [int] NULL,
-	[Frequency] [int] NULL,
+	[TimeOn] [int] NULL,
+	[TimeOff] [int] NULL,
 	[SourceTimestamp] [datetime2](7) NULL
 GO
 
